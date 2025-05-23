@@ -19,7 +19,7 @@
             <div class="d-flex gap-2">
                 <a href="/WebBanHang/Product/addToCart/<?php echo $product->id; ?>" class="btn btn-cute"><i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ</a>
                 <a href="/WebBanHang/Product/edit/<?php echo $product->id; ?>" class="btn btn-warning"><i class="fas fa-edit me-1"></i>Sửa</a>
-                <a href="/WebBanHang/Product/list" class="btn btn-secondary-cute">Quay lại</a>
+               <a href="/WebBanHang/Product" class="btn btn-secondary-cute">Quay lại</a>
             </div>
         </div>
     </div>

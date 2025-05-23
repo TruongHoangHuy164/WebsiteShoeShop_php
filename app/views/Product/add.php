@@ -44,7 +44,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-cute"><i class="fas fa-save me-2"></i>Thêm sản phẩm</button>
-            <a href="/WebBanHang/Product/list" class="btn btn-secondary-cute">Quay lại</a>
+           <a href="/WebBanHang/Product" class="btn btn-secondary-cute">Quay lại</a>
         </div>
     </form>
 </div>

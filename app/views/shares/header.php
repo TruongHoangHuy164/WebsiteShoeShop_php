@@ -101,9 +101,7 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo $base_url; ?>Product">Danh sách sản phẩm</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="<?php echo $base_url; ?>Product/add">Thêm sản phẩm</a>
-                    </li>
+                    
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo $base_url; ?>Category/list">Danh sách danh mục</a>
                     </li>

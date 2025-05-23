@@ -27,6 +27,7 @@
                         <p class="card-text"><strong>Giá:</strong> <?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?> VNĐ</p>
                         <p class="card-text"><strong>Danh mục:</strong> <?php echo htmlspecialchars($product->category_name, ENT_QUOTES, 'UTF-8'); ?></p>
                         <div class="d-flex justify-content-between flex-wrap gap-2">
+                            <a href="/WebBanHang/Product/show/<?php echo $product->id; ?>" class="btn btn-info btn-sm"><i class="fas fa-eye me-1"></i>Xem</a>
                             <a href="/WebBanHang/Product/edit/<?php echo $product->id; ?>" class="btn btn-warning btn-sm"><i class="fas fa-edit me-1"></i>Sửa</a>
                             <a href="/WebBanHang/Product/delete/<?php echo $product->id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');"><i class="fas fa-trash me-1"></i>Xóa</a>
                             <a href="/WebBanHang/Product/addToCart/<?php echo $product->id; ?>" class="btn btn-cute btn-sm"><i class="fas fa-cart-plus me-1"></i>Thêm vào giỏ</a>
