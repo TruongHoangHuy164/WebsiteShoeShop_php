@@ -22,12 +22,20 @@
                     <input type="text" id="name" name="name" class="form-control" value="<?php echo isset($_POST['name']) ? htmlspecialchars($_POST['name']) : ''; ?>" required>
                 </div>
                 <div class="mb-3">
+                    <label for="email" class="form-label">Email (không bắt buộc)</label>
+                    <input type="email" id="email" name="email" class="form-control" value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>">
+                </div>
+                <div class="mb-3">
                     <label for="phone" class="form-label">Số điện thoại</label>
                     <input type="text" id="phone" name="phone" class="form-control" value="<?php echo isset($_POST['phone']) ? htmlspecialchars($_POST['phone']) : ''; ?>" required>
                 </div>
                 <div class="mb-3">
                     <label for="address" class="form-label">Địa chỉ giao hàng</label>
                     <textarea id="address" name="address" class="form-control" rows="4" required><?php echo isset($_POST['address']) ? htmlspecialchars($_POST['address']) : ''; ?></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="note" class="form-label">Ghi chú (không bắt buộc)</label>
+                    <textarea id="note" name="note" class="form-control" rows="3"><?php echo isset($_POST['note']) ? htmlspecialchars($_POST['note']) : ''; ?></textarea>
                 </div>
                 <div class="d-flex justify-content-between">
                     <button type="submit" class="btn btn-cute"><i class="fas fa-credit-card me-2"></i>Đặt hàng</button>
@@ -84,6 +92,7 @@
         let name = document.getElementById('name').value.trim();
         let phone = document.getElementById('phone').value.trim();
         let address = document.getElementById('address').value.trim();
+        let email = document.getElementById('email').value.trim();
 
         if (name.length < 3 || name.length > 100) {
             alert('Tên phải từ 3 đến 100 ký tự.');
@@ -95,6 +104,10 @@
         }
         if (address.length < 10) {
             alert('Địa chỉ phải ít nhất 10 ký tự.');
+            return false;
+        }
+        if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Email không hợp lệ.');
             return false;
         }
         return true;

@@ -10,16 +10,20 @@ class OrderModel
         $this->conn = $db;
     }
 
-    public function createOrder($name, $phone, $address)
+    public function createOrder($name, $phone, $address, $email = null, $note = '0')
     {
-        $query = "INSERT INTO " . $this->order_table . " (name, phone, address) VALUES (:name, :phone, :address)";
+        $query = "INSERT INTO " . $this->order_table . " (name, phone, address, email, note) VALUES (:name, :phone, :address, :email, :note)";
         $stmt = $this->conn->prepare($query);
         $name = htmlspecialchars(strip_tags($name));
         $phone = htmlspecialchars(strip_tags($phone));
         $address = htmlspecialchars(strip_tags($address));
+        $email = $email ? htmlspecialchars(strip_tags($email)) : null;
+        $note = htmlspecialchars(strip_tags($note));
         $stmt->bindParam(':name', $name);
         $stmt->bindParam(':phone', $phone);
         $stmt->bindParam(':address', $address);
+        $stmt->bindParam(':email', $email);
+        $stmt->bindParam(':note', $note);
 
         if ($stmt->execute()) {
             return $this->conn->lastInsertId();
@@ -41,7 +45,7 @@ class OrderModel
 
     public function getOrders()
     {
-        $query = "SELECT id, name, phone, address, created_at FROM " . $this->order_table . " ORDER BY created_at DESC";
+        $query = "SELECT id, name, phone, address, email, note, created_at FROM " . $this->order_table . " ORDER BY created_at DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);

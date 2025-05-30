@@ -15,8 +15,10 @@
                     </div>
                     <div class="card-body">
                         <p><strong>Họ tên:</strong> <?php echo htmlspecialchars($order->name, ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Email:</strong> <?php echo htmlspecialchars($order->email ?: 'Không có', ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Số điện thoại:</strong> <?php echo htmlspecialchars($order->phone, ENT_QUOTES, 'UTF-8'); ?></p>
                         <p><strong>Địa chỉ:</strong> <?php echo htmlspecialchars($order->address, ENT_QUOTES, 'UTF-8'); ?></p>
+                        <p><strong>Ghi chú:</strong> <?php echo htmlspecialchars($order->note ?: 'Không có', ENT_QUOTES, 'UTF-8'); ?></p>
                         <h6>Chi tiết đơn hàng:</h6>
                         <?php $details = $orderModel->getOrderDetails($order->id); ?>
                         <table class="table table-hover">

@@ -6,6 +6,7 @@ session_start();
 require_once __DIR__ . '/app/config/database.php';
 require_once __DIR__ . '/app/models/ProductModel.php';
 require_once __DIR__ . '/app/models/CategoryModel.php';
+require_once __DIR__ . '/app/helpers/SessionHelper.php';
 
 // Lấy và xử lý URL
 $url = $_GET['url'] ?? '';

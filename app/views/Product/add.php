@@ -27,6 +27,10 @@
             <input type="number" id="price" name="price" class="form-control" step="0.01" required>
         </div>
         <div class="mb-3">
+            <label for="quantity" class="form-label">Số lượng</label>
+            <input type="number" id="quantity" name="quantity" class="form-control" min="0" required>
+        </div>
+        <div class="mb-3">
             <label for="category_id" class="form-label">Danh mục</label>
             <select id="category_id" name="category_id" class="form-control" required>
                 <option value="">Chọn danh mục</option>
@@ -44,7 +48,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-cute"><i class="fas fa-save me-2"></i>Thêm sản phẩm</button>
-           <a href="/WebBanHang/Product" class="btn btn-secondary-cute">Quay lại</a>
+            <a href="/WebBanHang/Product" class="btn btn-secondary-cute">Quay lại</a>
         </div>
     </form>
 </div>
@@ -64,6 +68,7 @@
         let name = document.getElementById('name').value.trim();
         let description = document.getElementById('description').value.trim();
         let price = document.getElementById('price').value;
+        let quantity = document.getElementById('quantity').value;
         let category = document.getElementById('category_id').value;
         let image = document.getElementById('image').files[0];
 
@@ -77,6 +82,10 @@
         }
         if (price <= 0) {
             alert('Giá phải là số dương.');
+            return false;
+        }
+        if (quantity < 0) {
+            alert('Số lượng phải là số không âm.');
             return false;
         }
         if (!category) {

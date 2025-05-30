@@ -5,7 +5,7 @@
 <?php if (!empty($errors)): ?>
     <div class="alert alert-danger animate__animated animate__fadeIn">
         <ul>
-            <?php foreach ($error as $error): ?>
+            <?php foreach ($errors as $error): ?>
                 <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
             <?php endforeach; ?>
         </ul>
@@ -27,6 +27,10 @@
         <div class="mb-3">
             <label for="price" class="form-label">Giá (VNĐ)</label>
             <input type="number" id="price" name="price" class="form-control" step="0.01" value="<?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?>" required>
+        </div>
+        <div class="mb-3">
+            <label for="quantity" class="form-label">Số lượng</label>
+            <input type="number" id="quantity" name="quantity" class="form-control <?php echo ($product->quantity ?? 0) <= 10 ? 'low-quantity' : ''; ?>" min="0" value="<?php echo htmlspecialchars($product->quantity ?? '0', ENT_QUOTES, 'UTF-8'); ?>" required>
         </div>
         <div class="mb-3">
             <label for="category_id" class="form-label">Danh mục</label>
@@ -51,7 +55,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-cute"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
-           <a href="/WebBanHang/Product" class="btn btn-secondary-cute">Quay lại</a>
+            <a href="/WebBanHang/Product/list" class="btn btn-secondary-cute">Quay lại</a>
         </div>
     </form>
 </div>
@@ -65,12 +69,17 @@
         color: #4a4a4a;
         font-weight: 500;
     }
+    .low-quantity {
+        color: red;
+        font-weight: bold;
+    }
 </style>
 <script>
     function validateForm() {
         let name = document.getElementById('name').value.trim();
         let description = document.getElementById('description').value.trim();
         let price = document.getElementById('price').value;
+        let quantity = document.getElementById('quantity').value;
         let category = document.getElementById('category_id').value;
         let image = document.getElementById('image').files[0];
 
@@ -84,6 +93,10 @@
         }
         if (price <= 0) {
             alert('Giá phải là số dương.');
+            return false;
+        }
+        if (quantity < 0) {
+            alert('Số lượng phải là số không âm.');
             return false;
         }
         if (!category) {
