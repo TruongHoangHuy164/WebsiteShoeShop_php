@@ -11,7 +11,7 @@ class CategoryModel
 
     public function getCategories()
     {
-        $query = "SELECT id, name, description FROM " . $this->table_name;
+        $query = "SELECT * FROM " . $this->table_name;
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_OBJ);
@@ -19,11 +19,11 @@ class CategoryModel
 
     public function getCategoryById($id)
     {
-        $query = "SELECT id, name, description FROM " . $this->table_name . " WHERE id = :id";
+        $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
         $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_OBJ);
+        return $stmt->fetch(PDO::FETCH_OBJ); // Thêm return để trả về kết quả
     }
 
     public function addCategory($name, $description)

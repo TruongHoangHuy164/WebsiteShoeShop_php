@@ -1,6 +1,6 @@
 <?php include 'app/views/shares/header.php'; ?>
 
-<h1 class="mb-4 text-center" style="color: #ff6b81;">Đăng ký tài khoản</h1>
+<h1 class="mb-4 text-center" style="color: #ff6b81;">Thêm người dùng mới</h1>
 
 <div class="row justify-content-center">
     <div class="col-md-6">
@@ -15,7 +15,7 @@
                 </div>
             <?php endif; ?>
 
-            <form method="POST" action="/WebBanHang/account/save" enctype="multipart/form-data">
+            <form method="POST" action="/WebBanHang/account/addUser" enctype="multipart/form-data">
                 <div class="mb-3">
                     <label for="username" class="form-label">Tên tài khoản</label>
                     <input type="text" id="username" name="username" class="form-control" value="<?php echo isset($_POST['username']) ? htmlspecialchars($_POST['username']) : ''; ?>" required>
@@ -73,23 +73,12 @@
                     </select>
                 </div>
                 <div class="d-flex justify-content-between">
-                    <button type="submit" class="btn btn-cute"><i class="fas fa-user-plus me-2"></i>Đăng ký</button>
-                    <a href="/WebBanHang/account/login" class="btn btn-secondary-cute">Đã có tài khoản? Đăng nhập</a>
+                    <button type="submit" class="btn btn-cute"><i class="fas fa-user-plus me-2"></i>Thêm người dùng</button>
+                    <a href="/WebBanHang/account/listUsers" class="btn btn-secondary-cute">Quay lại danh sách</a>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<style>
-    .form-control:focus, .form-select:focus {
-        border-color: #ff6b81;
-        box-shadow: 0 0 5px rgba(255, 107, 129, 0.5);
-    }
-    .form-label {
-        color: #4a4a4a;
-        font-weight: 500;
-    }
-</style>
 
 <?php include 'app/views/shares/footer.php'; ?>

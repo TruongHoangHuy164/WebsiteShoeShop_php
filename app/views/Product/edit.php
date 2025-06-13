@@ -3,7 +3,7 @@
 <h1 class="mb-4 text-center" style="color: #ff6b81;">Sửa sản phẩm</h1>
 
 <?php if (!empty($errors)): ?>
-    <div class="alert alert-danger animate__animated animate__fadeIn">
+    <div id="error-toast" class="alert alert-danger animate__animated animate__fadeIn">
         <ul>
             <?php foreach ($errors as $error): ?>
                 <li><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></li>
@@ -12,9 +12,23 @@
     </div>
 <?php endif; ?>
 
+<?php if (isset($_SESSION['success'])): ?>
+    <div id="success-toast" class="alert alert-success animate__animated animate__fadeIn">
+        <?php echo htmlspecialchars($_SESSION['success'], ENT_QUOTES, 'UTF-8'); ?>
+        <?php unset($_SESSION['success']); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (isset($_SESSION['error'])): ?>
+    <div id="error-toast" class="alert alert-danger animate__animated animate__fadeIn">
+        <?php echo htmlspecialchars($_SESSION['error'], ENT_QUOTES, 'UTF-8'); ?>
+        <?php unset($_SESSION['error']); ?>
+    </div>
+<?php endif; ?>
+
 <div class="card p-4" style="border-radius: 15px; background: #fff; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);">
     <form method="POST" action="/WebBanHang/Product/update" enctype="multipart/form-data" onsubmit="return validateForm();">
-        <input type="hidden" name="id" value="<?php echo $product->id; ?>">
+        <input type="hidden" name="id" value="<?php echo htmlspecialchars($product->id, ENT_QUOTES, 'UTF-8'); ?>">
         <input type="hidden" name="existing_image" value="<?php echo htmlspecialchars($product->image, ENT_QUOTES, 'UTF-8'); ?>">
         <div class="mb-3">
             <label for="name" class="form-label">Tên sản phẩm</label>
@@ -26,18 +40,18 @@
         </div>
         <div class="mb-3">
             <label for="price" class="form-label">Giá (VNĐ)</label>
-            <input type="number" id="price" name="price" class="form-control" step="0.01" value="<?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?>" required>
+            <input type="number" id="price" name="price" class="form-control" step="0.01" min="0" value="<?php echo htmlspecialchars($product->price, ENT_QUOTES, 'UTF-8'); ?>" required>
         </div>
         <div class="mb-3">
             <label for="quantity" class="form-label">Số lượng</label>
-            <input type="number" id="quantity" name="quantity" class="form-control <?php echo ($product->quantity ?? 0) <= 10 ? 'low-quantity' : ''; ?>" min="0" value="<?php echo htmlspecialchars($product->quantity ?? '0', ENT_QUOTES, 'UTF-8'); ?>" required>
+            <input type="number" id="quantity" name="quantity" class="form-control <?php echo ($product->quantity ?? 0) <= 10 ? 'low-quantity' : ''; ?>" min="0" step="1" value="<?php echo htmlspecialchars($product->quantity ?? '0', ENT_QUOTES, 'UTF-8'); ?>" required>
         </div>
         <div class="mb-3">
             <label for="category_id" class="form-label">Danh mục</label>
             <select id="category_id" name="category_id" class="form-control" required>
                 <option value="">Chọn danh mục</option>
                 <?php foreach ($categories as $category): ?>
-                    <option value="<?php echo $category->id; ?>" <?php echo ($category->id == $product->category_id) ? 'selected' : ''; ?>>
+                    <option value="<?php echo htmlspecialchars($category->id, ENT_QUOTES, 'UTF-8'); ?>" <?php echo ($category->id == $product->category_id) ? 'selected' : ''; ?>>
                         <?php echo htmlspecialchars($category->name, ENT_QUOTES, 'UTF-8'); ?>
                     </option>
                 <?php endforeach; ?>
@@ -55,7 +69,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-cute"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
-            <a href="/WebBanHang/Product/list" class="btn btn-secondary-cute">Quay lại</a>
+            <a href="/WebBanHang/Product" class="btn btn-secondary-cute">Quay lại</a>
         </div>
     </form>
 </div>
@@ -73,6 +87,18 @@
         color: red;
         font-weight: bold;
     }
+    .alert {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+        max-width: 400px;
+        animation: slideIn 0.5s ease-out;
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); }
+        to { transform: translateX(0); }
+    }
 </style>
 <script>
     function validateForm() {
@@ -84,31 +110,60 @@
         let image = document.getElementById('image').files[0];
 
         if (name.length < 3 || name.length > 100) {
-            alert('Tên sản phẩm phải từ 3 đến 100 ký tự.');
+            showToast('Tên sản phẩm phải từ 3 đến 100 ký tự.', 'error');
             return false;
         }
         if (!description) {
-            alert('Mô tả là bắt buộc.');
+            showToast('Mô tả là bắt buộc.', 'error');
             return false;
         }
-        if (price <= 0) {
-            alert('Giá phải là số dương.');
+        if (price <= 0 || !/^\d+(\.\d{1,2})?$/.test(price)) {
+            showToast('Giá phải là số dương với tối đa 2 chữ số thập phân.', 'error');
             return false;
         }
-        if (quantity < 0) {
-            alert('Số lượng phải là số không âm.');
+        if (quantity < 0 || !Number.isInteger(Number(quantity))) {
+            showToast('Số lượng phải là số nguyên không âm.', 'error');
             return false;
         }
         if (!category) {
-            alert('Vui lòng chọn danh mục.');
+            showToast('Vui lòng chọn danh mục.', 'error');
             return false;
         }
         if (image && image.size > 10 * 1024 * 1024) {
-            alert('Hình ảnh không được vượt quá 10MB.');
+            showToast('Hình ảnh không được vượt quá 10MB.', 'error');
             return false;
         }
         return true;
     }
+
+    function showToast(message, type) {
+        let toast = document.createElement('div');
+        toast.className = `alert alert-${type === 'error' ? 'danger' : 'success'} animate__animated animate__fadeIn`;
+        toast.style.position = 'fixed';
+        toast.style.top = '20px';
+        toast.style.right = '20px';
+        toast.style.zIndex = '1000';
+        toast.style.maxWidth = '400px';
+        toast.innerText = message;
+        document.body.appendChild(toast);
+        setTimeout(() => {
+            toast.classList.remove('animate__fadeIn');
+            toast.classList.add('animate__fadeOut');
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
+    }
+
+    // Tự động ẩn toast sau 3 giây
+    document.addEventListener('DOMContentLoaded', () => {
+        let toasts = document.querySelectorAll('#success-toast, #error-toast');
+        toasts.forEach(toast => {
+            setTimeout(() => {
+                toast.classList.remove('animate__fadeIn');
+                toast.classList.add('animate__fadeOut');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        });
+    });
 </script>
 
 <?php include 'app/views/shares/footer.php'; ?>

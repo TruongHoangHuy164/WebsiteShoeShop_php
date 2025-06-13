@@ -20,11 +20,15 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #f0f4ff, #ffffff);
-            color: #333;
-        }
+      body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1a0b3b 0%, #3b1b6b 30%, #6b3b9b 60%, #9b6bcb 100%);
+    color: #e0e0e0; /* Light gray for text readability against dark cosmic background */
+    margin: 0;
+    padding: 0;
+    min-height: 100vh; /* Ensure gradient covers full viewport */
+}
+
         .navbar {
             background: linear-gradient(to right, #ffccde, #b4e4e9);
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -86,6 +90,12 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
         .user-info {
             color: #4a4a4a;
             font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .user-info:hover {
+            color: #ff6b81 !important;
+            transform: scale(1.05);
         }
     </style>
 </head>
@@ -101,13 +111,21 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                     <li class="nav-item">
                         <a class="nav-link" href="<?php echo $base_url; ?>Product">Danh sách sản phẩm</a>
                     </li>
-                    
-                    <li class="nav-item">
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <li class="nav-item">
                         <a class="nav-link" href="<?php echo $base_url; ?>Category/list">Danh sách danh mục</a>
-                    </li>
-                    <li class="nav-item">
+                        </li>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'user'): ?>
+                        <li class="nav-item">
                         <a class="nav-link" href="<?php echo $base_url; ?>Product/orderHistory">Lịch sử đặt hàng</a>
-                    </li>
+                        </li>
+                    <?php endif; ?>
+                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="<?php echo $base_url; ?>account/listUsers"><i class="fas fa-users me-1"></i>Quản lý người dùng</a>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link cart-icon" href="<?php echo $base_url; ?>Product/cart">
                             <i class="fas fa-cart-shopping"></i>
@@ -118,7 +136,7 @@ if (isset($_SESSION['cart']) && is_array($_SESSION['cart'])) {
                     </li>
                     <?php if (isset($_SESSION['username'])): ?>
                         <li class="nav-item d-flex align-items-center">
-                            <span class="user-info me-3"><?php echo htmlspecialchars($_SESSION['fullname']); ?> (<?php echo $_SESSION['role']; ?>)</span>
+                            <a href="<?php echo $base_url; ?>account/editProfile" class="user-info me-3"><?php echo htmlspecialchars($_SESSION['fullname']); ?> (<?php echo $_SESSION['role']; ?>)</a>
                             <a class="nav-link" href="<?php echo $base_url; ?>account/logout"><i class="fas fa-sign-out-alt me-1"></i>Đăng xuất</a>
                         </li>
                     <?php else: ?>

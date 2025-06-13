@@ -30,11 +30,11 @@ table table-hover">
                                     <img src="/WebBanHang/<?php echo htmlspecialchars($item['image'] ?: 'uploads/placeholder.jpg', ENT_QUOTES, 'UTF-8'); ?>" alt="Product Image" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
                                 </td>
                                 <td><?php echo htmlspecialchars($item['name'], ENT_QUOTES, 'UTF-8'); ?></td>
-                                <td><?php echo number_format($item['price'], 0, ',', '.'); ?> VNĐ</td>
+                                <td><?php echo number_format($item['price'], 0, ',', '.'); ?> </td>
                                 <td>
                                     <input type="number" class="form-control quantity-input" style="width: 80px;" min="0" value="<?php echo $item['quantity']; ?>" data-product-id="<?php echo $id; ?>">
                                 </td>
-                                <td class="subtotal"><?php echo number_format($item['price'] * $item['quantity'], 0, ',', '.'); ?> VNĐ</td>
+                                <td class="subtotal"><?php echo number_format($item['price'] * $item['quantity'], 0, ',', '.'); ?> </td>
                                 <td>
                                     <a href="/WebBanHang/Product/removeFromCart/<?php echo $id; ?>" class="btn btn-danger btn-sm" onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?');"><i class="fas fa-trash"></i></a>
                                 </td>
