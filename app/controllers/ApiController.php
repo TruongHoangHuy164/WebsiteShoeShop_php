@@ -3,12 +3,14 @@
 require_once 'app/config/database.php';
 require_once 'app/models/ProductModel.php';
 require_once 'app/models/CategoryModel.php';
+require_once('app/utils/JWTHandler.php'); // 
 
 class ApiController
 {
     private $productModel;
     private $categoryModel;
     private $db;
+    private $jwtHandler; // 
 
     public function __construct()
     {
@@ -19,8 +21,23 @@ class ApiController
         }
         $this->productModel = new ProductModel($this->db);
         $this->categoryModel = new CategoryModel($this->db);
+        $this->jwtHandler = new JWTHandler(); // 
     }
+    private function authenticate()
+    {
+        $headers = apache_request_headers();
 
+        if (isset($headers['Authorization'])) {
+            $authHeader = $headers['Authorization'];
+            $arr = explode(" ", $authHeader);
+            $jwt = $arr[1] ?? null;
+            if ($jwt) {
+                $decoded = $this->jwtHandler->decode($jwt);
+                return $decoded ? true : false;
+            }
+        }
+        return false;
+    }
     private function sendResponse($statusCode, $data)
     {
         header('Content-Type: application/json');

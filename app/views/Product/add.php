@@ -100,4 +100,4 @@
     }
 </script>
 
-<?php include 'app/views/shares/footer.php'; ?>
+<?php include 'app/views/shares/footer.php'; ?>z

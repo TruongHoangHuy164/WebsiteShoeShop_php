@@ -1,12 +1,12 @@
 <?php
 require_once 'app/config/database.php';
 require_once 'app/models/AccountModel.php';
-
+require_once('app/utils/JWTHandler.php'); 
 class AccountController
 {
     private $accountModel;
     private $db;
-
+private $jwtHandler; 
     public function __construct()
     {
         $this->db = (new Database())->getConnection();
@@ -16,6 +16,7 @@ class AccountController
             exit();
         }
         $this->accountModel = new AccountModel($this->db);
+        $this->jwtHandler = new JWTHandler(); 
     }
 
     private function isAdmin()

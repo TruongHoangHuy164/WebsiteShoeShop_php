@@ -18,10 +18,10 @@
 <div class="container main-content">
     <div class="action-bar">
         <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-        <a href="/WebBanHang/Product/add" class="btn-primary-custom">
+        <button class="btn-primary-custom" onclick="showAddProductForm()">
             <i class="fas fa-plus"></i>
             <span>Thêm sản phẩm mới</span>
-        </a>
+        </button>
         <?php endif; ?>
     </div>
 
@@ -114,9 +114,58 @@
         </div>
         <div class="products-grid" id="products-grid"></div>
     </div>
+
+    <!-- Add/Edit Product Modal -->
+    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeProductModal()">&times;</span>
+            <h2 id="modalTitle">Thêm sản phẩm mới</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="product_name">Tên sản phẩm</label>
+                    <input type="text" id="product_name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_description">Mô tả</label>
+                    <textarea id="product_description" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="product_price">Giá (VNĐ)</label>
+                    <input type="number" id="product_price" name="price" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_quantity">Số lượng</label>
+                    <input type="number" id="product_quantity" name="quantity" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="product_category_id">Danh mục</label>
+                    <select id="product_category_id" name="category_id" required>
+                        <!-- Populated via JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="product_image">Hình ảnh (URL)</label>
+                    <input type="text" id="product_image" name="image">
+                </div>
+                <input type="hidden" id="product_id" name="id">
+                <button type="submit" class="btn-submit">Lưu</button>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script>
+// Utility function to show alerts
+function showAlert(message, type = 'error') {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert-${type}`;
+    alertDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+    document.querySelector('.main-content').prepend(alertDiv);
+    setTimeout(() => alertDiv.remove(), 5000);
+}
+
 // Fetch categories and populate the dropdown
 async function fetchCategories() {
     try {
@@ -124,7 +173,9 @@ async function fetchCategories() {
         const result = await response.json();
         if (response.ok && result.data) {
             const categorySelect = document.getElementById('category_id');
+            const modalCategorySelect = document.getElementById('product_category_id');
             categorySelect.innerHTML = '<option value="">Tất cả danh mục</option>';
+            modalCategorySelect.innerHTML = '';
             result.data.forEach(category => {
                 const option = document.createElement('option');
                 option.value = category.id;
@@ -132,13 +183,14 @@ async function fetchCategories() {
                 if (new URLSearchParams(window.location.search).get('category_id') == category.id) {
                     option.selected = true;
                 }
-                categorySelect.appendChild(option);
+                categorySelect.appendChild(option.cloneNode(true));
+                modalCategorySelect.appendChild(option);
             });
         } else {
-            console.error('Failed to fetch categories:', result.error || 'Unknown error');
+            showAlert(result.error || 'Không thể tải danh mục');
         }
     } catch (error) {
-        console.error('Error fetching categories:', error);
+        showAlert('Lỗi khi tải danh mục: ' + error.message);
     }
 }
 
@@ -170,12 +222,12 @@ async function fetchProducts() {
         } else {
             emptyState.style.display = 'block';
             productsGrid.style.display = 'none';
-            console.error('Failed to fetch products:', result.error || 'Unknown error');
+            showAlert(result.error || 'Không thể tải sản phẩm');
         }
     } catch (error) {
-        console.error('Error fetching products:', error);
-        document.getElementById('empty-state').style.display = 'block';
-        document.getElementById('products-grid').style.display = 'none';
+        emptyState.style.display = 'block';
+        productsGrid.style.display = 'none';
+        showAlert('Lỗi khi tải sản phẩm: ' + error.message);
     }
 }
 
@@ -193,7 +245,7 @@ function renderProducts(products) {
         
         productCard.innerHTML = `
             <div class="product-image-container">
-                <img src="/WebBanHang/${product.image || 'uploads/placeholder.jpg'}" 
+                <img src="/WebBanHang/${product.image || 'Uploads/placeholder.jpg'}" 
                      class="product-image" 
                      alt="${product.name}">
                 <div class="product-overlay">
@@ -239,15 +291,12 @@ function renderProducts(products) {
                     </a>
                     ${isAdmin ? `
                     <div class="action-buttons">
-                        <a href="/WebBanHang/Product/edit/${product.id}" class="btn-action edit" title="Chỉnh sửa">
+                        <button class="btn-action edit" title="Chỉnh sửa" onclick="showEditProductForm(${product.id})">
                             <i class="fas fa-edit"></i>
-                        </a>
-                        <a href="/WebBanHang/Product/delete/${product.id}" 
-                           class="btn-action delete" 
-                           title="Xóa"
-                           onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">
+                        </button>
+                        <button class="btn-action delete" title="Xóa" onclick="deleteProduct(${product.id})">
                             <i class="fas fa-trash"></i>
-                        </a>
+                        </button>
                     </div>` : ''}
                 </div>
             </div>
@@ -261,6 +310,98 @@ function renderProducts(products) {
             this.style.opacity = '1';
         });
     });
+}
+
+// Show add product modal
+function showAddProductForm() {
+    document.getElementById('modalTitle').textContent = 'Thêm sản phẩm mới';
+    document.getElementById('productForm').reset();
+    document.getElementById('product_id').value = '';
+    document.getElementById('productModal').style.display = 'block';
+}
+
+// Show edit product modal
+async function showEditProductForm(id) {
+    try {
+        const response = await fetch(`/WebBanHang/api/product/${id}`);
+        const result = await response.json();
+        if (response.ok && result.data) {
+            const product = result.data;
+            document.getElementById('modalTitle').textContent = 'Chỉnh sửa sản phẩm';
+            document.getElementById('product_id').value = product.id;
+            document.getElementById('product_name').value = product.name;
+            document.getElementById('product_description').value = product.description;
+            document.getElementById('product_price').value = product.price;
+            document.getElementById('product_quantity').value = product.quantity;
+            document.getElementById('product_category_id').value = product.category_id;
+            document.getElementById('product_image').value = product.image || '';
+            document.getElementById('productModal').style.display = 'block';
+        } else {
+            showAlert(result.error || 'Không thể tải thông tin sản phẩm');
+        }
+    } catch (error) {
+        showAlert('Lỗi khi tải thông tin sản phẩm: ' + error.message);
+    }
+}
+
+// Close product modal
+function closeProductModal() {
+    document.getElementById('productModal').style.display = 'none';
+}
+
+// Handle product form submission
+document.getElementById('productForm')?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const id = formData.get('id');
+    const data = {
+        name: formData.get('name'),
+        description: formData.get('description'),
+        price: parseFloat(formData.get('price')),
+        quantity: parseInt(formData.get('quantity')),
+        category_id: parseInt(formData.get('category_id')),
+        image: formData.get('image')
+    };
+
+    try {
+        const url = id ? `/WebBanHang/api/product/${id}` : '/WebBanHang/api/products';
+        const method = id ? 'PUT' : 'POST';
+        const response = await fetch(url, {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        
+        if (response.ok) {
+            showAlert(result.message, 'success');
+            closeProductModal();
+            fetchProducts();
+        } else {
+            showAlert(result.errors?.join(', ') || result.error || 'Lỗi khi lưu sản phẩm');
+        }
+    } catch (error) {
+        showAlert('Lỗi khi lưu sản phẩm: ' + error.message);
+    }
+});
+
+// Delete product
+async function deleteProduct(id) {
+    if (!confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+    try {
+        const response = await fetch(`/WebBanHang/api/product/${id}`, {
+            method: 'DELETE'
+        });
+        const result = await response.json();
+        if (response.ok) {
+            showAlert(result.message, 'success');
+            fetchProducts();
+        } else {
+            showAlert(result.error || 'Không thể xóa sản phẩm');
+        }
+    } catch (error) {
+        showAlert('Lỗi khi xóa sản phẩm: ' + error.message);
+    }
 }
 
 // Handle form submission
@@ -367,6 +508,87 @@ window.addEventListener('resize', () => {
     twinklingContainer.innerHTML = '';
     createTwinklingStars();
 });
+
+// Modal close on click outside
+document.getElementById('productModal')?.addEventListener('click', (e) => {
+    if (e.target === document.getElementById('productModal')) {
+        closeProductModal();
+    }
+});
 </script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 1000;
+}
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    position: relative;
+}
+.close {
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+}
+.form-group {
+    margin-bottom: 15px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+.form-group textarea {
+    height: 100px;
+}
+.btn-submit {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-submit:hover {
+    background-color: #218838;
+}
+.alert-error, .alert-success {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+</style>
 
 <?php include 'app/views/shares/footer.php'; ?>
